@@ -8,3 +8,5 @@
 
 data/*.db
 *.sqlite3
+
+.env
