@@ -28,10 +28,10 @@ async def main():
     )
 
     context = """
-    Traveller requirements: 7-day trip from Bengaluru, 2 adults 1 child,
+    Traveller requirements: 10-day trip from Bengaluru, 2 adults 1 child,
     nature and quiet places, relaxed pace.
 
-    Destination brief: Koh Lanta, Thailand — December 2026.
+    Destination brief: Koh Tao and Phi Phi islands, Thailand — December 2026.
 
     Build the itinerary.
     """
