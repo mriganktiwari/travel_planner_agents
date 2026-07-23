@@ -772,3 +772,39 @@ The best initial milestone is not “the agent responds.”
 It is:
 
 > Given a sample user request, I can clearly state what information the application should extract, which agent should handle each responsibility, and what a successful final response must contain.
+
+---
+
+# 13. Future Extensions (Post-MVP)
+
+Ideas to revisit once a working version of the app (through Step 11) exists. Not part of the two-day MVP scope.
+
+## 13.1 Comparative Region/Sub-Destination Analysis
+
+When a user names a broad destination but is undecided between sub-regions or islands (e.g. "Thailand, but not sure north/south/which island"), extend `destination_agent` with a second mode: produce a structured side-by-side comparison instead of a single recommendation.
+
+Suggested comparison dimensions:
+
+- nightlife / general vibe;
+- crowd levels for the stated travel month;
+- beach/water quality;
+- family-friendliness;
+- activity density;
+- typical cost tier;
+- ideal length of stay.
+
+This requires a new branch in `root_agent`'s orchestration: detect "user wants to choose between options," present the comparison, and wait for the user's next message with their pick before calling `itinerary_agent` — the same wait-for-clarification mechanism already used for missing duration, just applied to destination choice.
+
+Note: this stays qualitative/LLM-knowledge based, same "estimates, not facts" framing as the rest of the app. Not live data.
+
+## 13.2 Live Flight/Hotel Prices and Reviews
+
+Fetch indicative flight and hotel prices, plus hotel ratings/reviews, for a chosen destination via external APIs (e.g. flight aggregator APIs, Google Places for ratings). Out of scope for the MVP because it introduces a different class of complexity:
+
+- API keys/secrets management;
+- usage costs beyond free tiers;
+- rate limits;
+- network failures (unlike current deterministic tools, which are pure Python with no network calls);
+- restricted/partner-only access for some review data sources.
+
+Architecturally this still fits the existing "tools" pattern (a function an agent calls), but probably deserves its own dedicated agent (e.g. a "price research agent") to keep the one-agent-one-job design intact. Scope this as its own project once the core MVP is working end-to-end — not a small add-on.
