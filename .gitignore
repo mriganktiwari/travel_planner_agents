@@ -5,3 +5,6 @@
 *.pyc
 *.pyo
 *.pyd
+
+data/*.db
+*.sqlite3
