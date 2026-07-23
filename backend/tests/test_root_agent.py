@@ -49,7 +49,7 @@ async def main():
 
     print("--- Turn 1 ---")
     await print_session_state("before turn 1")
-    await send(runner, "Plan a five-day Kerala trip for a family of four.")
+    await send(runner, "Plan a 10-day Thailand trip for a family of 3.")
     await print_session_state("after turn 1")
 
     print("--- Turn 2 (follow-up) ---")
