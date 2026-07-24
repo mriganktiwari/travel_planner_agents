@@ -24,6 +24,7 @@ graphviz==0.21
 greenlet==3.5.4
 h11==0.16.0
 httpcore==1.0.9
+httptools==0.8.0
 httpx==0.28.1
 idna==3.18
 ipykernel==7.3.0
@@ -75,6 +76,8 @@ typing-inspection==0.4.2
 tzlocal==5.4.4
 urllib3==2.7.0
 uvicorn==0.51.0
+uvloop==0.22.1
 watchdog==6.0.0
+watchfiles==1.2.0
 wcwidth==0.8.2
 websockets==15.0.1
