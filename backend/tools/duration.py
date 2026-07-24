@@ -1,3 +1,10 @@
+"""Deterministic duration-validation tool, used by root_agent.
+
+Plain Python — no LLM/ADK involved — so it's testable standalone and gives
+a repeatable sanity check instead of letting the model judge on its own.
+"""
+
+
 def validate_trip_duration(num_days: int) -> dict:
     """Validates a requested trip duration.
 

@@ -1,3 +1,6 @@
+"""Zero-LLM-cost check that DatabaseSessionService actually persists to
+disk: run once to create a session, run again to confirm it's found."""
+
 import asyncio
 from google.adk.sessions import DatabaseSessionService
 

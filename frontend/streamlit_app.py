@@ -1,3 +1,11 @@
+"""Streamlit chat UI — a pure HTTP client of the FastAPI backend.
+
+Never imports google.adk or calls Gemini directly; all agent logic lives
+behind the backend's /sessions and /chat endpoints. session_id is stored in
+st.session_state (persists across reruns in one browser tab, resets on
+reload) purely to keep passing the same conversation to the backend.
+"""
+
 import streamlit as st
 import requests
 
@@ -16,6 +24,7 @@ SAMPLE_PROMPTS = [
 
 
 def start_new_session() -> str:
+    """Calls POST /sessions and returns the new session_id."""
     response = requests.post(f"{API_BASE_URL}/sessions")
     response.raise_for_status()
     return response.json()["session_id"]

@@ -1,3 +1,11 @@
+"""Root travel agent: the single entry point for the multi-agent system.
+
+Interprets the user's request, validates duration, and delegates destination
+research and itinerary planning to specialist agents (wired in as AgentTools
+so it stays in control and returns one combined answer, per the product
+contract in docs/product-contract.md).
+"""
+
 from google.adk.agents import Agent
 from google.adk.tools.agent_tool import AgentTool
 from .destinations_agent import destination_agent

@@ -1,3 +1,11 @@
+"""Reusable core that wraps root_agent behind plain async functions.
+
+Owns one Runner + one DatabaseSessionService for the whole process (created
+once at import time, not per-request) so any interface — FastAPI today,
+anything else later — can create sessions and send messages without
+touching ADK directly. Keeps agent/session logic out of the API routes.
+"""
+
 import uuid
 from dotenv import load_dotenv
 from google.adk.runners import Runner
@@ -30,6 +38,7 @@ async def create_session() -> str:
 
 
 async def session_exists(session_id: str) -> bool:
+    """Returns True if a session with this ID already exists."""
     session = await session_service.get_session(
         app_name=APP_NAME, user_id=USER_ID, session_id=session_id
     )

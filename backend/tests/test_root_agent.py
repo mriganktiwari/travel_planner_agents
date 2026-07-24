@@ -1,3 +1,7 @@
+"""Multi-turn test for root_agent (full orchestration: duration validation,
+destination_agent, itinerary_agent) against a DatabaseSessionService-backed
+session, so context survives across separate runs of this script."""
+
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))

@@ -1,3 +1,6 @@
+"""Instruction text for itinerary_agent, kept separate from agent wiring
+so the wording can be tuned without touching code (see plan.md section 5)."""
+
 ITINERARY_AGENT_INSTRUCTION = """
 You are the Itinerary Planning agent in a travel planning system.
 

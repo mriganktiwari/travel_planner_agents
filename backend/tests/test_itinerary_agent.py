@@ -1,3 +1,6 @@
+"""Standalone test for itinerary_agent, fed a hand-written destination brief
+(no root_agent/destination_agent involved)."""
+
 from google.adk.agents import Agent
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService

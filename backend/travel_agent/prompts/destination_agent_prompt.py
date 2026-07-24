@@ -1,3 +1,6 @@
+"""Instruction text for destination_agent, kept separate from agent wiring
+so the wording can be tuned without touching code (see plan.md section 5)."""
+
 DESTINATION_AGENT_INSTRUCTION = """
 You are the Destination Research agent in a travel planning system.
 

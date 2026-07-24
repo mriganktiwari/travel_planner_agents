@@ -1,3 +1,5 @@
+"""Step 2 smoke test: one basic ADK agent -> Gemini, no sub-agents/tools."""
+
 from google.adk.agents import Agent
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService

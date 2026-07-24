@@ -1,3 +1,5 @@
+"""Standalone test for destination_agent, run in isolation (no root_agent)."""
+
 from google.adk.agents import Agent
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService

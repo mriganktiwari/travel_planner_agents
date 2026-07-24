@@ -1,3 +1,10 @@
+"""Deterministic budget-allocation tool, used by itinerary_agent.
+
+Plain Python — no LLM/ADK involved — so it's testable standalone and gives
+repeatable arithmetic instead of letting the model guess numbers.
+"""
+
+
 def allocate_budget(total_budget: float, num_days: int) -> dict:
     """Splits a total trip budget into standard categories.
 

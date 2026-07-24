@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Travel Agent MVP — Architecture</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --panel: #ffffff;
+    --border: #dde1e8;
+    --text: #1a1d23;
+    --muted: #6b7280;
+    --accent: #3b76d9;
+    --accent2: #1f9d6c;
+    --accent3: #c9821c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px 20px 80px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  p.sub { color: var(--muted); margin: 0 0 36px; font-size: 14px; }
+  .flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .box {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    text-align: center;
+  }
+  .box .label { font-size: 15px; font-weight: 600; }
+  .box .desc { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+  .arrow {
+    color: var(--muted);
+    font-size: 20px;
+    line-height: 1;
+    padding: 4px 0;
+  }
+  .arrow .cap { font-size: 11px; display: block; color: var(--muted); }
+
+  .agents-row {
+    width: 100%;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+  .agents-row .box { flex: 1; }
+  .accentA { border-color: var(--accent); }
+  .accentB { border-color: var(--accent2); }
+  .accentC { border-color: var(--accent3); }
+
+  .side-note {
+    max-width: 720px;
+    margin: 14px auto 0;
+    display: flex;
+    gap: 12px;
+  }
+  .side-note .box { font-size: 12.5px; }
+
+  .tools-line {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .legend {
+    max-width: 720px;
+    margin: 48px auto 0;
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+  }
+  .legend h2 { font-size: 15px; margin: 0 0 10px; }
+  .legend ul { margin: 0; padding-left: 18px; font-size: 13.5px; color: var(--muted); line-height: 1.7; }
+  .legend li b { color: var(--text); }
+</style>
+</head>
+<body>
+
+  <h1>Travel Agent MVP — Architecture</h1>
+  <p class="sub">Streamlit → FastAPI → ADK Runner → root_agent → specialist agents/tools → Gemini. SQLite persists sessions on the side.</p>
+
+  <div class="flow">
+
+    <div class="box">
+      <div class="label">Streamlit UI (frontend/streamlit_app.py)</div>
+      <div class="desc">Pure HTTP client. Never imports google.adk or calls Gemini directly.</div>
+    </div>
+
+    <div class="arrow">↓<span class="cap">HTTP: session_id + message</span></div>
+
+    <div class="box accentA">
+      <div class="label">FastAPI (backend/api/main.py)</div>
+      <div class="desc">Thin routes only — GET /health, POST /sessions, POST /chat. No agent logic here.</div>
+    </div>
+
+    <div class="arrow">↓</div>
+
+    <div class="box">
+      <div class="label">agent_runner.py (backend/services)</div>
+      <div class="desc">One Runner + one DatabaseSessionService, created once per process, reused across every request.</div>
+    </div>
+
+    <div class="arrow">↓</div>
+
+    <div class="box accentB">
+      <div class="label">root_agent</div>
+      <div class="desc">Extracts requirements, validates duration, delegates, combines one final answer per the product contract.</div>
+      <div class="tools-line">tool: validate_trip_duration (deterministic, no LLM)</div>
+    </div>
+
+    <div class="arrow">↓ <span class="cap">calls as AgentTools</span></div>
+
+    <div class="agents-row">
+      <div class="box accentC">
+        <div class="label">destination_agent</div>
+        <div class="desc">Recommends/validates destination → destination brief.</div>
+      </div>
+      <div class="box accentC">
+        <div class="label">itinerary_agent</div>
+        <div class="desc">Day-by-day plan + costs.</div>
+        <div class="tools-line">tool: allocate_budget</div>
+      </div>
+    </div>
+
+    <div class="arrow">↓</div>
+
+    <div class="box">
+      <div class="label">Gemini via Vertex AI</div>
+      <div class="desc">Every agent above is the same model, given a different role via its instruction text.</div>
+    </div>
+
+  </div>
+
+  <div class="side-note">
+    <div class="box">
+      <div class="label">data/travel_agent.db (SQLite)</div>
+      <div class="desc">DatabaseSessionService reads/writes here. Sessions + events survive process restarts — this is what makes follow-up messages and app restarts work.</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <h2>Key ideas worth remembering</h2>
+    <ul>
+      <li><b>AgentTool, not sub_agents.</b> Specialists are called as tools, not handed the conversation — root_agent stays in control and always returns one combined answer, never a specialist's raw output.</li>
+      <li><b>Two unrelated "sessions."</b> ADK's session (backend, SQLite, survives restarts) vs. Streamlit's <code>st.session_state</code> (frontend, one browser tab, resets on reload). The only link is the shared <code>session_id</code> string.</li>
+      <li><b>Tools are plain Python, agents are LLM calls.</b> <code>allocate_budget</code> and <code>validate_trip_duration</code> run with zero model involvement — repeatable arithmetic, not guesses.</li>
+      <li><b>One Runner serves every session.</b> <code>session_id</code> is passed per-call, not baked into the Runner, so a single backend process safely handles many independent conversations at once.</li>
+    </ul>
+  </div>
+
+</body>
+</html>
